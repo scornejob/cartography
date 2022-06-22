@@ -59,6 +59,10 @@ def load_ecr_repositories(
         SET r.lastupdated = {aws_update_tag}
     """
     logger.info(f"Loading {len(repos)} ECR repositories for region {region} into graph.")
+    # neo4j does not accept datetime objects and values. This loop is used to convert
+    # these values to string. Same as https://github.com/lyft/cartography/issues/649#issuecomment-880252157
+    for key in repos:
+        key['createdAt'] = str(key['createdAt'])
     neo4j_session.run(
         query,
         Repositories=repos,
